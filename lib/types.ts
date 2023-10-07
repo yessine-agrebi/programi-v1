@@ -29,5 +29,18 @@ export interface ProgramData {
       date: string; // Assuming date is in string format
     }[];
   }
+
+export interface Set {
+    setId: number
+    weight: number
+    reps: number
+    setNum: number
+    isBestSet: boolean
+}
+
+export interface GroupedSet {
+  date: string
+  sets: Set[]
+}
   
   
