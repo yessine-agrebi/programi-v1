@@ -4,9 +4,16 @@ import {
   AccordionHeader,
   AccordionBody,
 } from "@material-tailwind/react";
-import { Exercise, GroupedSet, Set } from "@/lib/types";
+import { Exercise, GroupedSet, Set, Workout } from "@/lib/types";
 import API from "@/api/API";
-import { Table, TableBody, TableCell, TableHead, TableRow } from "./table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./table";
 
 function Icon({ id, open }: { id: number; open: number }) {
   return (
@@ -63,10 +70,14 @@ export function AccordionCustomIcon({
           {workout.exerciseName}
         </AccordionHeader>
         <AccordionBody>
-          <TableBody>
-            {groupedSets?.map((group: GroupedSet) => (
-              <>
-                <TableHead key={group.date}>{group.date}</TableHead>
+          {groupedSets?.map((group: GroupedSet, index) => (
+            <Table key={index}>
+              <TableHeader>
+                <TableRow>
+                  <TableHead key={group.date}>{group.date}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody >
                 {group.sets.map((set: Set) => (
                   <TableRow key={set.setId}>
                     <TableCell>{set.setNum}</TableCell>
@@ -74,9 +85,9 @@ export function AccordionCustomIcon({
                     <TableCell>{set.weight}</TableCell>
                   </TableRow>
                 ))}
-              </>
-            ))}
-          </TableBody>
+              </TableBody>
+            </Table>
+          ))}
         </AccordionBody>
       </Accordion>
     </>

@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import useSWR from "swr";
 const formSchema = z.object({
   programName: z.string().min(2, {
     message: "name must be at least 2 characters.",
@@ -37,19 +38,14 @@ const formSchema = z.object({
 });
 
 const Programs = () => {
-  const [isDispalyed, setIsDisplayed] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>([]);
-
-  useEffect(() => {
-    API.get<Program[]>("/programs")
-      .then((res) => {
-        console.log(res.data);
-        setPrograms(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const [isDisplayed, setIsDisplayed] = useState(false);
+  const fetcher = (url: string) =>
+    API.get(url).then((res) => {
+      console.log(res.data);
+      return res.data;
+    });
+    
+  const { data, isLoading, error } = useSWR("/programs", fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,7 +59,7 @@ const Programs = () => {
   });
 
   function displayForm() {
-    setIsDisplayed(!isDispalyed);
+    setIsDisplayed(!isDisplayed);
   }
 
   // 2. Define a submit handler.
@@ -91,7 +87,7 @@ const Programs = () => {
       >
         Create a Program
       </Button>
-      {isDispalyed && (
+      {isDisplayed && (
         <div className="mt-5 max-w-screen-sm">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -164,7 +160,7 @@ const Programs = () => {
         </div>
       )}
       <div className="mt-5 grid md:grid-cols-3 gap-4">
-        {programs.map((program) => (
+        {isLoading ? <div>Loading....</div> : (data ? data.map((program: Program) => (
           <Card key={program.programId} className="">
             <CardHeader>
               <CardTitle>{program.programName}</CardTitle>
@@ -179,20 +175,19 @@ const Programs = () => {
               <p>
                 End: {new Date(program.endDate).toISOString().split("T")[0]}
               </p>
-              
-              <Link href={`/programs/${encodeURIComponent(program.programId)}`} >
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                View Program
-              </Button>
-              </Link>
 
+              <Link href={`/programs/${encodeURIComponent(program.programId)}`}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  View Program
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
-        ))}
+        )): <div>{error}</div>)}
       </div>
     </div>
   );
