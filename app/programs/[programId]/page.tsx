@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Exercise, ProgramData, Workout } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 
 export default function Page({ params }: { params: { programId: number } }) {
@@ -37,9 +37,11 @@ export default function Page({ params }: { params: { programId: number } }) {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
+                  <Link href={`/exercises/workout/${encodeURIComponent(workout.workoutId)}`}>
                     <Button variant="outline" color="blue" size="sm">
                       Open
                     </Button>
+                  </Link>
                   </CardContent>
                 </Card>
               );

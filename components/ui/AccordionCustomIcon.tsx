@@ -1,11 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Accordion,
   AccordionHeader,
   AccordionBody,
 } from "@material-tailwind/react";
-import { Exercise, GroupedSet, Set, Workout } from "@/lib/types";
-import API from "@/api/API";
 import {
   Table,
   TableBody,
@@ -14,6 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
+import { fetcher } from "@/lib/utils";
+import useSWR from "swr";
+import { Exercise, Set } from "@/lib/types";
 
 function Icon({ id, open }: { id: number; open: number }) {
   return (
@@ -38,24 +39,13 @@ function Icon({ id, open }: { id: number; open: number }) {
 
 export function AccordionCustomIcon({
   open,
-  workout,
+  exercise,
 }: {
   open: number;
-  workout: Exercise;
+  exercise: Exercise;
 }) {
   const [openAccordion, setOpenAccordion] = React.useState(0);
-  const [groupedSets, setGroupedSets] = React.useState<GroupedSet[]>([]);
-
-  useEffect(() => {
-    API.get<GroupedSet[]>(`/sets/exercise/${workout.exerciseId}`)
-      .then((res) => {
-        setGroupedSets(res.data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const {data, isLoading, error} = useSWR(`/sets/exercise/${exercise.exerciseId}`, fetcher);
 
   const handleOpen = (value: number) =>
     setOpenAccordion(openAccordion === value ? 0 : value);
@@ -67,27 +57,31 @@ export function AccordionCustomIcon({
         icon={<Icon id={openAccordion} open={open} />}
       >
         <AccordionHeader onClick={() => handleOpen(open)}>
-          {workout.exerciseName}
+          {exercise.exerciseName}
         </AccordionHeader>
         <AccordionBody>
-          {groupedSets?.map((group: GroupedSet, index) => (
-            <Table key={index}>
-              <TableHeader>
+          {isLoading ? (<div>Loading...</div>) : data ?(
+            <Table className="w-full">
+              <TableHead className="flex">
                 <TableRow>
-                  <TableHead key={group.date}>{group.date}</TableHead>
+                  <TableHeader>Set</TableHeader>
+                  <TableHeader>Reps</TableHeader>
+                  <TableHeader>Weight</TableHeader>
                 </TableRow>
-              </TableHeader>
-              <TableBody >
-                {group.sets.map((set: Set) => (
-                  <TableRow key={set.setId}>
-                    <TableCell>{set.setNum}</TableCell>
-                    <TableCell>{set.reps}</TableCell>
-                    <TableCell>{set.weight}</TableCell>
-                  </TableRow>
-                ))}
+              </TableHead>
+              <TableBody>
+                {data.map((set: Set) => {
+                  return (
+                    <TableRow key={set.setId}>
+                      <TableCell>{set.setNum}</TableCell>
+                      <TableCell>{set.reps}</TableCell>
+                      <TableCell>{set.weight}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
-          ))}
+          ): (<div>{error}</div>)}
         </AccordionBody>
       </Accordion>
     </>
