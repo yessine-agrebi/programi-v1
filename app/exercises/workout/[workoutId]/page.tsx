@@ -17,11 +17,13 @@ const page = ({ params }: { params: { workoutId: number } }) => {
     <div className="mt-4">
       {data.map((exercise: Exercise) => {
         return (
-          <AccordionCustomIcon
-            key={exercise.exerciseId}
-            open={exercise.exerciseId}
-            exercise={exercise}
-          />
+          <div className="flex flex-col gap-5 w-full md:justify-center md:items-center">
+            <AccordionCustomIcon
+              key={exercise.exerciseId}
+              open={exercise.exerciseId}
+              exercise={exercise}
+            />
+          </div>
         );
       })}
     </div>

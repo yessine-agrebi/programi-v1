@@ -51,24 +51,25 @@ export function AccordionCustomIcon({
     setOpenAccordion(openAccordion === value ? 0 : value);
 
   return (
-    <>
       <Accordion
         open={openAccordion === open}
         icon={<Icon id={openAccordion} open={open} />}
+        color="lightBlue"
+        className="p-4 border-1 shadow-md text-gray-700 md:w-1/2"
       >
         <AccordionHeader onClick={() => handleOpen(open)}>
           {exercise.exerciseName}
         </AccordionHeader>
         <AccordionBody>
-          {isLoading ? (<div>Loading...</div>) : data ?(
-            <Table className="w-full">
-              <TableHead className="flex">
+          {isLoading ? (<p>Loading...</p>) : data ?(
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableHeader>Set</TableHeader>
-                  <TableHeader>Reps</TableHeader>
-                  <TableHeader>Weight</TableHeader>
+                  <TableHead>Set</TableHead>
+                  <TableHead>Reps</TableHead>
+                  <TableHead>Weight</TableHead>
                 </TableRow>
-              </TableHead>
+              </TableHeader>
               <TableBody>
                 {data.map((set: Set) => {
                   return (
@@ -84,6 +85,5 @@ export function AccordionCustomIcon({
           ): (<div>{error}</div>)}
         </AccordionBody>
       </Accordion>
-    </>
   );
 }
