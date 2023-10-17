@@ -19,7 +19,6 @@ export interface Exercise {
 
 export interface Workout {
   workoutId: number;
-  exercises: Exercise[];
   date: string;
   workoutName: string;
 }

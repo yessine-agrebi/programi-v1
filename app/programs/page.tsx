@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import useSWR from "swr";
+import { fetcher } from "@/lib/utils";
 const formSchema = z.object({
   programName: z.string().min(2, {
     message: "name must be at least 2 characters.",
@@ -39,11 +40,7 @@ const formSchema = z.object({
 
 const Programs = () => {
   const [isDisplayed, setIsDisplayed] = useState(false);
-  const fetcher = (url: string) =>
-    API.get(url).then((res) => {
-      console.log(res.data);
-      return res.data;
-    });
+  
     
   const { data, isLoading, error } = useSWR("/programs", fetcher);
 
